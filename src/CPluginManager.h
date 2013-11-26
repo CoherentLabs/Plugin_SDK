@@ -2,11 +2,11 @@
 
 #pragma once
 
+#include <IPluginBase.h>
 #include <Game.h>
 #include <map>
 
 #include <IPluginManager.h>
-#include <IPluginBase.h>
 #include <CPluginBase.hpp>
 #include <CryLibrary.h>
 
@@ -202,7 +202,7 @@ namespace PluginManager
 
             const char* GetVersion() const
             {
-                return "1.3.0.0";
+                return "2.0.0.0";
             };
 
             const char* GetName() const
@@ -248,11 +248,11 @@ namespace PluginManager
 
             bool ReloadPlugin( const char* sPluginPath, bool bInitialize = false );
 
-            bool InitializePlugin(  const char* sPluginName );
+            bool InitializePlugin( const char* sPluginName );
 
             void InitializePluginRange( int nBeginAtMode = IM_Min, int nEndAtMode = IM_Max );
 
-            bool RegisterTypesPluginRange( int nBeginAtMode = IM_Min, int nEndAtMode = IM_Max, int nFactoryType = int( FT_None ), bool bUnregister = false  );
+            bool RegisterTypesPluginRange( int nBeginAtMode = IM_Min, int nEndAtMode = IM_Max, int nFactoryType = int( FT_None ), bool bUnregister = false );
 
             IPluginBase* GetPluginByName( const char* sPluginName ) const;
 
@@ -286,7 +286,7 @@ namespace PluginManager
 
             void* GetStaticInterface( const char* sName, const char* sVersion = NULL ) const;
 
-            void RegisterStaticInterface ( void* pInterface, const char* sName, const char* sVersion = NULL );
+            void RegisterStaticInterface( void* pInterface, const char* sName, const char* sVersion = NULL );
 
             // Directory information functions
 #if defined(WIN_INTERCEPTORS)

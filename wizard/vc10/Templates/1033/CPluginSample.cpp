@@ -68,6 +68,22 @@ namespace [!output PROJECT_NAME_SAFE]Plugin
         {
             if ( gEnv && gEnv->pSystem && !gEnv->pSystem->IsQuitting() )
             {
+                // UIEvents
+                if ( gEnv->pConsole && ( enFactoryType == FT_All || enFactoryType == FT_UIEvent ) )
+                {
+                    if ( !bUnregister )
+                    {
+                        // TODO: Register CVars here if you have some
+                        // ...
+                    }
+
+                    else
+                    {
+                        // TODO: Unregister CVars here if you have some
+                        // ...
+                    }
+                }
+
                 // CVars
                 if ( gEnv->pConsole && ( enFactoryType == FT_All || enFactoryType == FT_CVar ) )
                 {
@@ -101,7 +117,7 @@ namespace [!output PROJECT_NAME_SAFE]Plugin
                 }
 
                 // Game Objects
-                if ( gEnv->pGameFramework && ( enFactoryType == FT_All || enFactoryType == FT_GameObjectExtension ) )
+                if ( gEnv->pGame && gEnv->pGame->GetIGameFramework() && ( enFactoryType == FT_All || enFactoryType == FT_GameObjectExtension ) )
                 {
                     if ( !bUnregister )
                     {

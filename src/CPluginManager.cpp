@@ -330,7 +330,7 @@ namespace PluginManager
                 // Register Listeners
                 if ( gEnv && gEnv->pGame && gEnv->pGame->GetIGameFramework() )
                 {
-                    gEnv->pGame->GetIGameFramework()->RegisterListener( this, PLUGIN_NAME, FRAMEWORKLISTENERPRIORITY_DEFAULT );
+                    gEnv->pGame->GetIGameFramework()->RegisterListener( this, PLUGIN_NAME, eFLPriority_Default );
                 }
 
                 if ( gEnv && gEnv->pSystem && gEnv->pSystem->GetISystemEventDispatcher() )
@@ -540,6 +540,11 @@ namespace PluginManager
                 LogAlways( "System Shutdown detected, unloading all plugins!" );
                 UnloadAllPlugins();
                 OnPostUpdate( 0 ); // call our gc
+
+#if CDK_VERSION >= 350 // In new CDK version gEnv is already invalid in destructor
+                Release( true );
+                gPluginManager = NULL;
+#endif
             }
         }
     }
@@ -578,7 +583,7 @@ namespace PluginManager
             // this worked very well for all of my plugins in all cases (quit in main menu, quit in level and quit using the menu or X)
         }
 
-        else if (  m_UnloadingPlugins.size() )
+        else if ( m_UnloadingPlugins.size() )
         {
             bool bUnloadedSomething = false;
 
@@ -889,7 +894,7 @@ namespace PluginManager
 
                 if ( iface && iface->GetInitializationMode() == nMode && !iface->IsInitialized() ) // Initialize plugins in order
                 {
-                    if ( !iface->Init( *gEnv, gStartupInitParams, GetBase(), pluginIter->second.m_sDirectory  ) )
+                    if ( !iface->Init( *gEnv, gStartupInitParams, GetBase(), pluginIter->second.m_sDirectory ) )
                     {
                         LogError( "Init failed: Name(%s)", SAFESTR( iface->GetName() ) );
                     }
@@ -1051,7 +1056,7 @@ namespace PluginManager
         return NULL;
     }
 
-    void CPluginManager::RegisterStaticInterface ( void* pInterface, const char* sName, const char* sVersion )
+    void CPluginManager::RegisterStaticInterface( void* pInterface, const char* sName, const char* sVersion )
     {
         if ( !sName || !pInterface )
         {

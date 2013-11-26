@@ -8,6 +8,12 @@
 PluginManager::IPluginManager* gPluginManager = NULL; //!< Global plugin manager pointer inside game dll
 #endif
 
+#if defined(__GAMESTARTUP_H__)
+SSystemInitParams* gStartupParams = NULL; //!< Global startup params
+#elif defined(__GAME_H__)
+extern SSystemInitParams* gStartupParams;
+#endif
+
 /**
 * @brief Provide a macro to realize WinProc injector with minimal modifications
 */
@@ -29,6 +35,8 @@ PluginManager::IPluginManager* gPluginManager = NULL; //!< Global plugin manager
 
 namespace PluginManager
 {
+
+
     /**
     * @brief Initialize the Plugin Manager
     * This code must be called once in the game dll GameStartup
@@ -63,7 +71,12 @@ namespace PluginManager
                         // plugin link library found
                         if ( !iface->IsInitialized() ) // Initialize plugins in order
                         {
+#if defined(SYS_ENV_AS_STRUCT)
+
+                            if ( !iface->Init( gEnv, startupParams, NULL, NULL ) )
+#else
                             if ( !iface->Init( *gEnv, startupParams, NULL, NULL ) )
+#endif
                             {
                                 CryLogAlways( "[" PLUGIN_TEXT "_" PLUGIN_MANAGER "] Init failed" );
                             }
@@ -96,40 +109,55 @@ namespace PluginManager
 
                             else
                             {
-                                CryLogAlways(  "[" PLUGIN_TEXT "_" PLUGIN_MANAGER "] Concrete Interface not available in the requested version" );
+                                CryLogAlways( "[" PLUGIN_TEXT "_" PLUGIN_MANAGER "] Concrete Interface not available in the requested version" );
                             }
                         }
 
                         else
                         {
-                            CryLogAlways(  "[" PLUGIN_TEXT "_" PLUGIN_MANAGER "] Couldn't be fully initialized" );
+                            CryLogAlways( "[" PLUGIN_TEXT "_" PLUGIN_MANAGER "] Couldn't be fully initialized" );
                         }
                     }
 
                     else
                     {
-                        CryLogAlways(  "[" PLUGIN_TEXT "_" PLUGIN_MANAGER "] Not compatible with this CryEngine SDK version(%s)", buildVersion );
+                        CryLogAlways( "[" PLUGIN_TEXT "_" PLUGIN_MANAGER "] Not compatible with this CryEngine SDK version(%s)", buildVersion );
                     }
                 }
 
                 else
                 {
-                    CryLogAlways(  "[" PLUGIN_TEXT "_" PLUGIN_MANAGER "] Base interface version(%s) couldn't be retrieved", sBaseInterfaceVersion ? sBaseInterfaceVersion : "" );
+                    CryLogAlways( "[" PLUGIN_TEXT "_" PLUGIN_MANAGER "] Base interface version(%s) couldn't be retrieved", sBaseInterfaceVersion ? sBaseInterfaceVersion : "" );
                 }
             }
 
             else
             {
-                CryLogAlways(  "[" PLUGIN_TEXT "_" PLUGIN_MANAGER "] Plugin entry point " PLUGIN_ENTRYPOINT " not found" );
+                CryLogAlways( "[" PLUGIN_TEXT "_" PLUGIN_MANAGER "] Plugin entry point " PLUGIN_ENTRYPOINT " not found" );
             }
         }
 
         else
         {
-            CryLogAlways(  "[" PLUGIN_TEXT "_" PLUGIN_MANAGER "] CryLoadLibrary Module(%s) couldn't be loaded, check path or dependencies", sPluginManagerPath.c_str() );
+            CryLogAlways( "[" PLUGIN_TEXT "_" PLUGIN_MANAGER "] CryLoadLibrary Module(%s) couldn't be loaded, check path or dependencies", sPluginManagerPath.c_str() );
         }
 
         return false; // Failure
+    }
+
+    static void RememberStartupParams( SSystemInitParams& startupParams )
+    {
+        gStartupParams = &startupParams;
+    }
+
+    static bool InitPluginManager( const char* sBaseInterfaceVersion = NULL, const char* sConcreteInterfaceVersion = NULL )
+    {
+        if ( gStartupParams )
+        {
+            return InitPluginManager( *gStartupParams, sBaseInterfaceVersion, sConcreteInterfaceVersion );
+        }
+
+        return false;
     }
 
     /**
@@ -148,6 +176,7 @@ namespace PluginManager
             gPluginManager->RegisterTypesPluginRange( IM_BeforeFramework, IM_BeforeFramework_3, FT_CVar );
             gPluginManager->RegisterTypesPluginRange( IM_BeforeFramework, IM_BeforeFramework_3, FT_CVarCommand );
             gPluginManager->RegisterTypesPluginRange( IM_BeforeFramework, IM_BeforeFramework_3, FT_GameObjectExtension );
+            gPluginManager->RegisterTypesPluginRange( IM_BeforeFramework, IM_BeforeFramework_3, FT_UIEvent );
         }
     }
 
@@ -164,6 +193,7 @@ namespace PluginManager
             gPluginManager->RegisterTypesPluginRange( IM_Last, IM_Last_3, FT_CVar );
             gPluginManager->RegisterTypesPluginRange( IM_Last, IM_Last_3, FT_CVarCommand );
             gPluginManager->RegisterTypesPluginRange( IM_Last, IM_Last_3, FT_GameObjectExtension );
+            // UI Events cant be registered at this point
 
             if ( gEnv && gEnv->pConsole )
             {
