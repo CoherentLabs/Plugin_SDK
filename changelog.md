@@ -1,16 +1,29 @@
-Plugin SDK 2.0.0 (18.11.2013)
+Plugin SDK 2.0.1 (x.x.2014)
+-----------------------------
+Stable Release for CryEngine 3.5.X (32/64 bit)
+
+New:
+* Built in support for the GameObjectExtenstion REGISTER macros
+ (custom entity class inside of plugin)
+
+Plugin SDK 2.0.0 (29.11.2013)
 -----------------------------
 Stable Release for CryEngine 3.5.4 (32/64 bit)
 
 New:
 * Plugin Wizard for Visual Studio 2012
 * Plugin Wizard for Visual Studio 2013
+* Basic Camera plugin in installer
+* More optional components in installer
 
 Changes:
 * Updated indenter for plugin wizards
 
-Installer:
-* More optional parts
+Fixes:
+* Manager buildable from path with spaces now (don't recommend it though, because its not officially supported by Sandbox)
+
+Thanks to all who tested and contributed to the 3.5.4 port,
+it wouldn't have been possible without your support.
 
 Plugin SDK 1.3.0 (02.03.2013)
 -----------------------------
